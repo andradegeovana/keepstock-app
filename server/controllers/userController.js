@@ -18,6 +18,7 @@ userController.register = async (req, res) => {
       usuario: req.body.usuario,
       senha: req.body.senha,
       email: req.body.email,
+      cpf: req.body.cpf,
       telefone: req.body.telefone,
     }
 

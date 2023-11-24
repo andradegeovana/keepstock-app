@@ -17,8 +17,9 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 app.post('/register', userController.register);
 app.post('/login', userController.login);
 app.post('/cadastrar', produtoController.cadastrar);
-app.delete('/remover_produto', produtoController.remover_produto);
+app.delete('/remover_produto/:id', produtoController.remover_produto);
 app.post('/editar_produto/:id', produtoController.editar_produto);
+app.get('/mostrar_produtos', produtoController.mostrar_produtos);
 
 db.sequelize.sync().then(() => {
   app.listen(port, () => {

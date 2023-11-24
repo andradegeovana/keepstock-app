@@ -16,6 +16,11 @@ module.exports = (sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      // Define a coluna 'imagem' 
+      imagem: {
+        type:DataTypes.TEXT('long'),
+        allowNull: true
+      },
       // Define a coluna 'nome' 
       nome: {
         type: DataTypes.STRING(256),
@@ -40,13 +45,7 @@ module.exports = (sequelize) => {
       preco: {
         type: DataTypes.FLOAT,
         allowNull: false,
-      },
-      // Define a coluna 'id_usuario' 
-      id_usuario: {
-        type: DataTypes.INTEGER,
-        foreignKey: 'id_usuario',
-        onDelete: 'CASCADE',
-      },
+      }
     },
     {
       // Configurações adicionais do modelo, como a instância 'sequelize', o nome do modelo e a tabela

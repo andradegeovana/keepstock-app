@@ -14,7 +14,7 @@
 ## Instalação
 
 1. Clone este repositório: `git clone https://github.com/andradegeovana/keepstock-app.git`
-2. Navegue até o diretório do projeto: `keepstock-app`
+2. Navegue até o diretório do projeto: `keepstock-app/server`
 3. Instale as dependências: `npm install`
 
 ## Uso

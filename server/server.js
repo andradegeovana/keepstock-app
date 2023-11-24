@@ -18,7 +18,7 @@ app.post('/register', userController.register);
 app.post('/login', userController.login);
 app.post('/cadastrar', produtoController.cadastrar);
 app.delete('/remover_produto', produtoController.remover_produto);
-app.post('/editar_produto', produtoController.editar_produto);
+app.post('/editar_produto/:id', produtoController.editar_produto);
 
 db.sequelize.sync().then(() => {
   app.listen(port, () => {

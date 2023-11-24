@@ -67,8 +67,13 @@ produtoController.remover_produto = async (req, res) => {
 // Função para editar um produto
 produtoController.editar_produto = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = req.params.id;
     const produto = await db.Produto.findOne({ where: { id } });
+    console.log(produto);
+    if (!produto) {
+      return res.status(401).json({ message: "Unauthorized" });
+      
+    }
     let info = {
       nome: req.body.nome,
       categoria: req.body.categoria,
@@ -77,21 +82,8 @@ produtoController.editar_produto = async (req, res) => {
       preco: req.body.preco
     }
 
-    // Verifica se o produto foi encontrado
-    if (!id) {
-      return res.status(401).json({ message: "Unauthorized" });
-      
-    }else{
-      db.produto.update(info);
-    }
-
-    // Define o cabeçalho de autorização na resposta
-    res.set("Authorization", `Bearer ${token}`);
-
-    // Retorna uma resposta de sucesso em formato JSON, incluindo o token
-    res.status(200).json({auth: true, token });
-
-    
+    await produto.update(info, {where:{id:id}});
+    res.sendStatus(200);
 
   } catch (error) {
     console.log(error);

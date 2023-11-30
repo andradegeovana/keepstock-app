@@ -25,10 +25,24 @@ produtoController.cadastrar = async (req, res) => {
     // Cria um novo produto no banco de dados usando as informações fornecidas
     await db.Produto.create(info);
 
+    const registro ={
+      id_usuario: req.body.id_usuario,
+      id_produto: req.body.id_produto,
+      operacao: "Adição de produto",
+    }
+    await db.Registro.create(registro);
+
     // Retorna uma resposta de sucesso em formato JSON
     return res.status(200).json({ message: "O produto foi registrado com sucesso!" });
   } catch (error) {
     // Em caso de erro, imprime o erro no console e retorna uma resposta de erro
+    const registro ={
+      id_usuario: req.body.id_usuario,
+      id_produto: req.body.id_produto,
+      operacao: "Tentativa de adição de produto",
+    }
+    await db.Registro.create(registro);
+
     console.error("Erro no registro:", error);
     return res.status(500).json({ error: "O produto não foi registrado" });
   }
@@ -45,9 +59,23 @@ produtoController.remover_produto = async (req, res) => {
     }
 
     await produto.destroy({where:{id:id}});
+
+    const registro ={
+      id_usuario: req.body.id_usuario,
+      id_produto: req.body.id_produto,
+      operacao: "Exclusão de produto",
+    }
+    await db.Registro.create(registro);
+
     return res.status(200).json({ message: "O produto foi excluído com sucesso!" });
     
   } catch (error) {
+    const registro ={
+      id_usuario: req.body.id_usuario,
+      id_produto: req.body.id_produto,
+      operacao: "Falha na exclusão de produto",
+    }
+    await db.Registro.create(registro);
     console.log(error);
     return res.status(500).json({ error: "O produto não foi excluído" });
   }

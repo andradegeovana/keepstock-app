@@ -14,12 +14,13 @@ app.use(bodyParser.json({ extended: true }));
 app.use(cors({ origin: 'http://localhost:3000' }));
 
 // Rota para o formulário de registro
-app.post('/register', userController.register);
-app.post('/login', userController.login);
-app.post('/cadastrar', produtoController.cadastrar);
-app.delete('/remover_produto/:id', produtoController.remover_produto);
-app.post('/editar_produto/:id', produtoController.editar_produto);
-app.get('/mostrar_produtos', produtoController.mostrar_produtos);
+app.post('/api/usuario/registrar', userController.register);
+app.post('/api/login', userController.login);
+
+app.post('/api/produto/cadastrar', produtoController.cadastrar);
+app.delete('/api/produto/remover/:id', produtoController.remover_produto);
+app.post('/api/produto/editar/:id', produtoController.editar_produto);
+app.get('/api/produto/todos', produtoController.mostrar_produtos);
 
 db.sequelize.sync().then(() => {
   app.listen(port, () => {

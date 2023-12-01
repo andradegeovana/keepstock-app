@@ -1,5 +1,15 @@
+'use client'
+import { useState } from "react";
+import { fetchProdutos } from "./services/hooks";
+
 
 export default function Home() {
+  const [produtos, setProdutos] = useState([])
+const handleProdutos = () => {
+  let a = fetchProdutos()
+  console.log((a))
+ 
+}
   return (
     <div className="bg-[#3F8EFC] flex flex-col h-screen items-center justify-center">
       <div className="bg-white text-base flex flex-col items-center justify-center rounded-3xl h-[550px] w-[550px]">
@@ -17,7 +27,7 @@ export default function Home() {
           </div>
 
           <div className="botao">
-            <button type="submit">ENTRAR</button>
+            <button onClick={handleProdutos} type="submit">ENTRAR</button>
           </div>
         </form>
       </div>

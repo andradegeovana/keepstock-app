@@ -8,11 +8,11 @@ import { instance } from "../services/api";
 
 
 type AuthContextType = {
-  nome: string;
-  isAuth: boolean;
-  signIn: (data: SignInData) => Promise<void>;
-  signOut: () => void;
-};
+    nome: string;
+    isAuth: boolean;
+    signIn: (data: SignInData) => Promise<void>; // Make sure signIn is defined
+    signOut: () => void;
+  };
 
 export type SignInData = {
   login: string;
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: any) {
 
         setLembrarSenha(lembrarSenha);
 
-        router.push("/resumo/resumo");
+        router.push("/conteudo");
       } else {
         console.error("Autenticação falhou");
       }

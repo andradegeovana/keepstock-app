@@ -8,7 +8,7 @@ const userController = require('./controllers/userController');
 const produtoController = require('./controllers/produtoController');
 
 // Middleware para análise do corpo da solicitação
-app.use(bodyParser.json({ extended: true }));
+app.use(bodyParser.json({ limit: '200mb' }));
 
 // Use o middleware cors
 app.use(cors({ origin: 'http://localhost:3000' }));

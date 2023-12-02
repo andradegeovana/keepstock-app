@@ -64,16 +64,40 @@ userController.login = async (req, res) => {
 
     // Define o cabeçalho de autorização na resposta
     res.set("Authorization", `Bearer ${token}`);
-
+    let id = user.id
+    let nome = user.nome
     // Retorna uma resposta de sucesso em formato JSON, incluindo o token
-    res.status(200).json({auth: true, token });
+    res.status(200).json({auth: true, token, id, nome  });
   } catch (error) {
     // Em caso de erro, imprime o erro no console e retorna uma resposta de erro
     console.log(error);
     res.sendStatus(500);
   }
 };
+userController.mostrar_usuario = async (req, res) => {
+  try {
+    const id = req.params.id
+    const user = await db.User.findOne({ where: { id } });
 
+    return res.status(200).json(user);
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Não foi possível executar" });
+  }
+};
+
+userController.mostrar_usuarios = async (req, res) => {
+  try {
+    const data = await db.User.findAll();
+
+    return res.status(200).json(data);
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Não foi possível executar" });
+  }
+};
 // Exporta o objeto 'userController' para ser utilizado em outros arquivos
 module.exports = userController;
 

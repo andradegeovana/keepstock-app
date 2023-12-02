@@ -15,6 +15,8 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 // Rota para o formulário de registro
 app.post('/api/usuario/registrar', userController.register);
+app.get('/api/usuario/mostrar/:id', userController.mostrar_usuario);
+app.get('/api/usuario/todos', userController.mostrar_usuarios);
 app.post('/api/login', userController.login);
 
 app.post('/api/produto/cadastrar', produtoController.cadastrar);

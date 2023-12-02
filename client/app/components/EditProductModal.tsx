@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import axios from "axios";
 import { instance } from "../services/api";
-import { fetchProdutos } from "../services/hooks";
 
-interface ProductModalProps {
+interface EditProductModalProps {
   showModal: boolean;
   onClose: () => void;
-  onAddProduct: (formData: FormData) => void;
+  onEditProduct: (formData: FormData) => void;
+  productId: number | null;
 }
 
-const ProductModal: React.FC<ProductModalProps> = ({
+const EditProductModal: React.FC<EditProductModalProps> = ({
   showModal,
   onClose,
-  onAddProduct,
+  onEditProduct,
+  productId,
 }) => {
   const [formData, setFormData] = useState<any>({
     imagem: "",
@@ -23,6 +23,22 @@ const ProductModal: React.FC<ProductModalProps> = ({
     estoque: 0,
     preco: 0,
   });
+
+  useEffect(() => {
+    const loadProductDetails = async () => {
+      if (productId) {
+        try {
+          // Substitua pela lógica para buscar os detalhes do produto usando o ID
+          const response = await instance.get(`produto/editar/${productId}`);
+          setFormData(response.data);
+        } catch (error) {
+          console.error("Erro ao carregar detalhes do produto:", error);
+        }
+      }
+    };
+
+    loadProductDetails();
+  }, [productId]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,10 +51,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData: any) => ({ ...prevData, [name]: parseInt(value, 10) }));
+    setFormData((prevData: any) => ({
+      ...prevData,
+      [name]: parseInt(value, 10),
+    }));
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
 
     if (file) {
@@ -51,37 +72,37 @@ const ProductModal: React.FC<ProductModalProps> = ({
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-  
+
       reader.onload = () => {
         if (reader.result) {
           const base64String = reader.result.toString();
-          // Remova o prefixo 'data:image/png;base64,'
-          const base64WithoutPrefix = base64String.replace(/^data:image\/\w+;base64,/, '');
+          const base64WithoutPrefix = base64String.replace(
+            /^data:image\/\w+;base64,/,
+            ""
+          );
           resolve(base64WithoutPrefix);
         } else {
           reject("Failed to convert image to base64");
         }
       };
-  
+
       reader.onerror = (error) => reject(error);
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      onAddProduct(formData);
-      const response = await instance.post("produto/cadastrar", formData);
-      fetchProdutos()
+      onEditProduct(formData);
+      await instance.post(`produto/editar/${productId}`, formData);
       onClose();
     } catch (error) {
-      console.error("Erro ao adicionar produto:", error);
+      console.error("Erro ao editar produto:", error);
     }
   };
 
   return (
-    // Modal
     showModal && (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div
@@ -97,7 +118,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <FiX />
             </button>
           </div>
-          <h2 className="text-2xl font-bold mb-4">Adicionar Produto</h2>
+          <h2 className="text-2xl font-bold mb-4">Editar Produto</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
@@ -173,7 +194,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
-              Adicionar Produto
+              Salvar Edições
             </button>
           </form>
         </div>
@@ -182,6 +203,4 @@ const ProductModal: React.FC<ProductModalProps> = ({
   );
 };
 
-export default ProductModal;
-
-
+export default EditProductModal;

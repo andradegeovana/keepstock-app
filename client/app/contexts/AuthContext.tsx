@@ -8,70 +8,52 @@ import { instance } from "../services/api";
 
 
 type AuthContextType = {
+    id: number;
     nome: string;
     isAuth: boolean;
-    signIn: (data: SignInData) => Promise<void>; // Make sure signIn is defined
+    signIn: (login: string, senha: string) => Promise<void>; // Make sure signIn is defined
     signOut: () => void;
   };
 
-export type SignInData = {
-  login: string;
-  senha: string;
-  lembrarSenha: boolean;
-  token: string;
-};
 export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthProvider({ children }: any) {
   const [isAuth, setIsAuth] = useState(false);
-  const [nome, setNome] = useState<string>("")
-  const [lembrarSenha, setLembrarSenha] = useState(false);
+  const [nome, setNome] = useState<string>("");
+  const [id, setId] = useState<number>(0); // Defina o tipo como number | undefined
   const router = useRouter();
 
   useEffect(() => {
     const { token } = parseCookies();
-
-    // Recupera os valores armazenados em cookies
     const storedNome = localStorage.getItem("nome");
 
     setIsAuth(!!token);
 
-    // Define os valores iniciais com base nos cookies
     if (token && storedNome) {
       setNome(storedNome);
     }
   }, []);
 
-  const signIn = async (data: SignInData) => {
+  const signIn = async (login: string | null, senha: string | null) => {
     try {
-      const { login, senha, lembrarSenha } = data;
-      const res = await instance.post(
-        "login",
-        {
-          login,
-          senha: senha,
-        },
-      );
-      
-      const { auth, token, nome } = res.data;
-
+      const res = await instance.post("/login", {
+        usuario: login,
+        senha: senha,
+      });
+      console.log(res.data)
+      const { auth, token, nome, id } = res.data;
 
       if (auth) {
         setNome(nome);
+        setId(id);
         setIsAuth(true);
 
-        // Armazena os valores em cookies
         setCookie(null, "token", token, {
-          maxAge: 30 * 24 * 60 * 60, // 30 dias
+          maxAge: 30 * 24 * 60 * 60,
           path: "/",
         });
-        localStorage.setItem("nome", nome);
-        localStorage.setItem("access_token", token);
 
-
-        setLembrarSenha(lembrarSenha);
-
-        router.push("/conteudo");
+        router.push("/inicio");
       } else {
         console.error("Autenticação falhou");
       }
@@ -83,7 +65,6 @@ export function AuthProvider({ children }: any) {
   const signOut = () => {
     destroyCookie(null, "token");
 
-    // Remove os valores dos cookies e do localStorage
     localStorage.removeItem("nome");
     localStorage.removeItem("cargo");
     localStorage.removeItem("usuario_id");
@@ -94,7 +75,7 @@ export function AuthProvider({ children }: any) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuth, signIn, signOut, nome }}
+      value={{ isAuth, signIn, signOut, nome, id }}
     >
       {children}
     </AuthContext.Provider>

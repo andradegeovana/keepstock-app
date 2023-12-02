@@ -1,9 +1,12 @@
-'use client';
-import React, { useEffect, useState } from "react";
-import { FiPlus } from "react-icons/fi";
-import { fetchProdutos } from "../services/hooks";
+"use client";
+import React, { useEffect, useState, useContext } from "react";
+import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
+import { deleteProduto, fetchProdutos } from "../services/hooks";
 import Sidebar from "../components/sidebar";
 import ProductModal from "../components/ProductModal";
+import { AuthContext } from "../contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import EditProductModal from "../components/EditProductModal";
 
 interface Produto {
   id: number;
@@ -18,26 +21,50 @@ interface Produto {
 const Page: React.FC = () => {
   const [dados, setDados] = useState<Produto[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false); // Novo estado para o modal de edição
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  ); // Novo estado para o produto selecionado
 
-  const handleAddProduct = async (formData: any) => {
-    // Lógica para enviar dados ao backend e adicionar o produto
-    // (Implemente de acordo com a sua API)
-    console.log("Formulário submetido:", formData);
-    // Atualizar a lista de produtos, se necessário
-    // fetchProdutos()...
+  const { id, isAuth } = useContext(AuthContext);
+  const router = useRouter();
+  const handleAddProduct = async (formData: any) => {};
+  const handleEditClick = (productId: number) => {
+    // Configura o estado para abrir o modal de edição
+    setShowEditModal(true);
+    // Configura o estado com o ID do produto selecionado para edição
+    setSelectedProductId(productId);
   };
+  const handleEditProduct = async (formData: FormData) => {
+    // Lógica para editar produto (se necessário)
+    console.log("Produto editado:", formData);
+    // Atualize a lista de produtos após a edição
+    await fetchData();
+  };
+  const [isLoading, setIsLoading] = useState(true);
+  async function fetchData() {
+    try {
+      const produtos = await fetchProdutos();
+      setDados(produtos);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    } finally {
+      setIsLoading(false); // Indica que o carregamento foi concluído
+    }
+  }
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchDataAndSetState = async () => {
       try {
         const produtos = await fetchProdutos();
         setDados(produtos);
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
       }
-    }
-    fetchData();
-  }, []);
+    };
+
+    fetchDataAndSetState();
+  }, [showModal, showEditModal, selectedProductId]);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -60,12 +87,27 @@ const Page: React.FC = () => {
               className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-4"
             >
               <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+                <div className="flex justify-between mb-2">
+                  <p className="font-bold text-lg">{produto.nome}</p>
+                  <div className="flex space-x-2">
+                  <FiEdit2
+                    className="cursor-pointer text-blue-500"
+                    onClick={() => handleEditClick(produto.id)}
+                  />
+                    <FiTrash2
+                      className="cursor-pointer text-red-500"
+                      onClick={async () => {
+                        deleteProduto(produto.id);
+                        await fetchData();
+                      }}
+                    />
+                  </div>
+                </div>
                 <img
                   src={`data:image/png;base64,${produto.imagem}`}
                   alt="Imagem do Produto"
                   className="mb-2 rounded w-full h-32 object-cover"
                 />
-                <p className="font-bold text-lg">{produto.nome}</p>
                 <p className="text-gray-500">{produto.categoria}</p>
                 <p className="text-sm">{produto.descricao}</p>
                 <p className="mt-2">Estoque: {produto.estoque}</p>
@@ -80,6 +122,12 @@ const Page: React.FC = () => {
           showModal={showModal}
           onClose={() => setShowModal(false)}
           onAddProduct={handleAddProduct}
+        />
+        <EditProductModal
+          showModal={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onEditProduct={handleEditProduct}
+          productId={selectedProductId}
         />
       </div>
     </div>
